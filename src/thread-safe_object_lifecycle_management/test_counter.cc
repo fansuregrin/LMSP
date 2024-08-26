@@ -30,6 +30,27 @@ void testGetAndIncrease() {
     assert(c.getValue() == 10);
 }
 
+template <typename F>
+void testSwap(F swap) {
+    Counter a, b;
+    a.getAndIncrease();
+    long orgA = a.getValue();
+    long orgB = b.getValue();
+
+    std::thread t1([&] {
+        swap(a, b);
+    });
+    std::thread t2([&] {
+        swap(b, a);
+    });
+    t1.join();
+    t2.join();
+    assert(a.getValue() == orgA && b.getValue() == orgB);
+}
+
 int main() {
     testGetAndIncrease();
+    testSwap<decltype(swapV1)>(swapV1);
+    testSwap<decltype(swapV2)>(swapV2);
+    testSwap<decltype(swapV3)>(swapV3);
 }
